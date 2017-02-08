@@ -75,9 +75,6 @@ var paths = [
           time: data.time
         }
       };
-    },
-    refBuilder: function(ref, path) {
-      return ref.orderByChild('time').startAt(Date.now() - 1000 * 60 * 60 * 24 * 30);
     }
   },
   {
@@ -99,9 +96,6 @@ var paths = [
         user: data.user,
         venue: data.venue
       };
-    },
-    refBuilder: function(ref, path) {
-      return ref.orderByChild('time').startAt(Date.now() - 1000 * 60 * 60 * 24 * 30);
     }
   },
   {
@@ -125,9 +119,6 @@ var paths = [
           time: data.time
         }
       };
-    },
-    refBuilder: function(ref, path) {
-      return ref.orderByChild('time').startAt(Date.now() - 1000 * 60 * 60 * 24 * 30);
     }
   }
 ];
