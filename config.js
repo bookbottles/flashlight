@@ -12,8 +12,6 @@
 var _ = require('lodash')
   , normalizers = require('./lib/normalizers');
 
-console.log(process.env);
-
 // Your Firebase instance where we will listen and write search results
 exports.FB_URL   = process.env.FB_URL || 'https://bb-app-sandbox.firebaseio.com/';
 
@@ -30,6 +28,8 @@ exports.FB_SERVICEACCOUNT = process.env.FB_PROJECT_ID ? {
   clientEmail: process.env.FB_CLIENT_EMAIL,
   privateKey: process.env.FB_PRIVATE_KEY
 } : 'service-account.json';
+
+console.log(exports.FB_SERVICEACCOUNT);
 
 /** ElasticSearch Settings
  *********************************************/
