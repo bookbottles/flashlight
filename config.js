@@ -9,7 +9,8 @@
 /** Firebase Settings
  ***************************************************/
 
-var _ = require('lodash');
+var _ = require('lodash')
+  , normalizers = require('./lib/normalizers');
 
 // Your Firebase instance where we will listen and write search results
 exports.FB_URL   = process.env.FB_URL || 'https://bb-app-sandbox.firebaseio.com/';
@@ -61,6 +62,7 @@ else {
  * Format each path object with the same keys described above, and store the array of paths at whatever
  * location you specified in the FB_PATHS variable. Be sure to restrict that data in your Security Rules.
  ****************************************************/
+var duration = (process.env.FL_DAYS || 30) * 1000 * 60 * 60 * 24;
 var paths = [
   {
     name  : "response",
@@ -70,11 +72,14 @@ var paths = [
     parser: function(data) {
       return {
         response: {
-          data: normalizeResponseData(data.data),
+          data: normalizers.responseData(data.data),
           status: data.status,
           time: data.time
         }
       };
+    },
+    refBuilder: function(ref) {
+      return ref.orderByChild('time').startAt(Date.now() - duration);
     }
   },
   {
@@ -90,12 +95,15 @@ var paths = [
         request: {
           _id: key,
           action: data.action,
-          data: normalizeRequestData(data.data),
+          data: normalizers.requestData(data.data),
           time: data.time
         },
         user: data.user,
         venue: data.venue
       };
+    },
+    refBuilder: function(ref) {
+      return ref.orderByChild('time').startAt(Date.now() - duration);
     }
   },
   {
@@ -119,22 +127,31 @@ var paths = [
           time: data.time
         }
       };
+    },
+    refBuilder: function(ref) {
+      return ref.orderByChild('time').startAt(Date.now() - duration);
     }
   }
 ];
 
-exports.SEARCH_QUEUE = process.env.SEARCH_QUEUE;
+var allPaths = _.map(paths, 'name')
+  , monitorPaths = process.env.FL_PATHS === 'all' ? allPaths : _.intersection(allPaths, (process.env.FL_PATHS || '').split(','));
 
-if (process.env.MONITOR_PATHS) {
-  exports.MONITOR_PATHS = process.env.MONITOR_PATHS === 'all' ? _.map(paths, 'name') : process.env.MONITOR_PATHS.split(',');
-
-  exports.paths = _.filter(paths, function(path) {
-    return exports.MONITOR_PATHS.indexOf(path.name) > -1;
+if (monitorPaths.length) {
+  paths = _.filter(paths, function(path) {
+    return monitorPaths.indexOf(path.name) > -1;
   });
+  if (process.env.FL_DAYS === '0') {
+    paths = _.map(paths, _.partial(_.omit, _, 'refBuilder'));
+  }
+  exports.paths = paths;
 }
 
-// Paths can also be stored in Firebase! See README for details.
-//exports.paths = process.env.FB_PATHS || null;
+// The flag to control whether the app will monitor & index firebase paths
+exports.FL_INDEX = !!process.env.FL_PATHS;
+
+// The flag to control whether the app will handle search requests
+exports.FL_SEARCH = !!process.env.FL_SEARCH;
 
 // Additional options for ElasticSearch client
 exports.ES_OPTS = {
@@ -157,109 +174,4 @@ function processBonsaiUrl(exports, url) {
   exports.ES_USER = matches[1];
   exports.ES_PASS = matches[2];
   console.log('Configured using BONSAI_URL environment variable', url, exports);
-}
-
-
-var propertyHandlers = {
-  'venue': enforceObject,
-  'user': enforceObject,
-  'guest': enforceObject,
-  'guest.birthday': enforceDate,
-  'event': enforceObject,
-  'event.flyer': enforceObject,
-  'event.promoters': enforceValuesArray,
-  'ticket': enforceObject,
-  'ticket.questions': enforceKeyValueObjectsArray,
-  'area': enforceObject,
-  'party': enforceObject,
-  'party.guest': enforceObject,
-  'party.guest.birthday': enforceDate,
-  'party.questions': enforceKeyValueObjectsArray,
-  'reservation.servers': enforceValuesArray,
-  'reservation.tables': enforceReservationTablesArray,
-  'reservation.spends': enforceObject,
-  'reservation.guest': enforceObject,
-  'reservation.guest.birthday': enforceDate,
-  'promotion': enforceObject,
-  'promotion.days': enforceValuesArray,
-  'promo': enforceObject,
-  'promo.tickets': enforceValuesArray,
-  'referrer': enforceObject,
-  'date': enforceDate,
-  'priority': enforceNumeric,
-  'payment.reservation.gratuity': enforceNumeric,
-  'payment.reservation.tax': enforceNumeric
-};
-
-function enforceObject(data) {
-  return typeof data !== 'object' ? { _id: data } : data;
-}
-
-function enforceKeyValueObjectsArray(data) {
-  return _.isArray(data) ? data : _.map(data, function(val, key) {
-    return {
-      _id: key,
-      _value: val ? val.toString() : ''
-    };
-  });
-}
-
-function enforceValuesArray(data) {
-  return _.isArray(data) ? data : _.keys(data);
-}
-
-function enforceReservationTablesArray(data) {
-  return _.flatten(_.map(data, function(tables, area) {
-    return _.map(enforceValuesArray(tables), function(table) {
-      return {
-        area: area,
-        table: table
-      };
-    });
-  }));
-}
-
-function enforceNumeric(data) {
-  var val = parseFloat(data);
-  return val && !isNaN(val) ? val.toString() : null;
-}
-
-function enforceDate(data) {
-  try {
-    return new Date(data).toISOString();  
-  } catch (e) {
-    console.warn('cannot parse ' + data + ' as date');
-    return null;
-  }
-}
-
-function normalizeRequestData(data) {
-  if (_.isObject(data)) {
-    _.each(propertyHandlers, function(handler, prop) {
-      var val = _.get(data, prop);
-      if (val) {
-        _.set(data, prop, handler(val));
-      } else if (val === '') {
-        _.set(data, prop, null);
-      }
-    });
-  } else if (!_.isNil(data)) {
-    return _.set({}, '_value', data);
-  }
-  return data;
-}
-
-function normalizeResponseData(data) {
-  if (_.isObject(data)) {
-    if (!_.isArray(data)) {
-      if (!_.some(data, _.negate(_.isObject))) {
-        return _.map(data, function(val, key) {
-          return _.set(val, '_id', key);
-        });
-      }
-    }
-  } else if (!_.isNil(data)) {
-    return _.set({}, '_value', data);
-  }
-  return data;
 }
