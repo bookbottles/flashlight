@@ -26,7 +26,7 @@ exports.FB_RES   = process.env.FB_RES || 'search/response';
 exports.FB_SERVICEACCOUNT = process.env.FB_PROJECT_ID ? {
   projectId: process.env.FB_PROJECT_ID,
   clientEmail: process.env.FB_CLIENT_EMAIL,
-  privateKey: process.env.FB_PRIVATE_KEY
+  privateKey: process.env.FB_PRIVATE_KEY.replace(/\\n/g, '\n')
 } : 'service-account.json';
 
 console.log(exports.FB_SERVICEACCOUNT);
