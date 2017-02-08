@@ -29,13 +29,11 @@ exports.FB_SERVICEACCOUNT = process.env.FB_PROJECT_ID ? {
   privateKey: process.env.FB_PRIVATE_KEY.replace(/\\n/g, '\n')
 } : 'service-account.json';
 
-console.log(exports.FB_SERVICEACCOUNT);
-
 /** ElasticSearch Settings
  *********************************************/
 
 if( process.env.ES_URL ) {
-  processBonsaiUrl(exports, process.env.ES_URL);
+  processESUrl(exports, process.env.ES_URL);
 }
 else {
   // ElasticSearch server's host URL
@@ -161,6 +159,7 @@ exports.FL_SEARCH = !!process.env.FL_SEARCH;
 
 // Additional options for ElasticSearch client
 exports.ES_OPTS = {
+  requestTimeout: 120000
   //requestTimeout: 60000, maxSockets: 100, log: 'error'
 };
 
@@ -173,7 +172,7 @@ exports.CLEANUP_INTERVAL =
   3600 * 1000 /* once an hour */ :
   60 * 1000 /* once a minute */;
 
-function processBonsaiUrl(exports, url) {
+function processESUrl(exports, url) {
   var matches = url.match(/^https?:\/\/([^:]+):([^@]+)@([^/]+)\/?$/);
   exports.ES_HOST = matches[3];
   exports.ES_PORT = 80;
