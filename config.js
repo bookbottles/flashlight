@@ -12,6 +12,8 @@
 var _ = require('lodash')
   , normalizers = require('./lib/normalizers');
 
+console.log(process.env);
+
 // Your Firebase instance where we will listen and write search results
 exports.FB_URL   = process.env.FB_URL || 'https://bb-app-sandbox.firebaseio.com/';
 
