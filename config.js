@@ -27,7 +27,7 @@ exports.FB_SERVICEACCOUNT = process.env.FB_PROJECT_ID ? {
   projectId: process.env.FB_PROJECT_ID,
   clientEmail: process.env.FB_CLIENT_EMAIL,
   privateKey: process.env.FB_PRIVATE_KEY
-} || 'service-account.json';
+} : 'service-account.json';
 
 /** ElasticSearch Settings
  *********************************************/
