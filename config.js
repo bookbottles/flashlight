@@ -159,7 +159,7 @@ exports.FL_SEARCH = !!process.env.FL_SEARCH;
 
 // Additional options for ElasticSearch client
 exports.ES_OPTS = {
-  requestTimeout: 120000
+  requestTimeout: process.env.ES_TIMEOUT || 120000
   //requestTimeout: 60000, maxSockets: 100, log: 'error'
 };
 
