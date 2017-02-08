@@ -4,9 +4,7 @@
   "description": "A search utility for Firebase",
   "homepage": "https://github.com/firebase/flashlight",
   "scripts": {
-    "start": "node app.js",
-    "monitor": "nodemon app.js",
-    "deploy": "gcloud app deploy"
+    "start": "FL_SEARCH=true node ./app.js"
   },
   "main": "app.js",
   "devDependencies": {},

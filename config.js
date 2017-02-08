@@ -23,13 +23,17 @@ exports.FB_RES   = process.env.FB_RES || 'search/response';
 
 // See https://firebase.google.com/docs/server/setup for instructions
 // to auto-generate the service-account.json file
-exports.FB_SERVICEACCOUNT = process.env.FB_ACC || 'service-account.json';
+exports.FB_SERVICEACCOUNT = process.env.FB_PROJECT_ID ? {
+  projectId: process.env.FB_PROJECT_ID,
+  clientEmail: process.env.FB_CLIENT_EMAIL,
+  privateKey: process.env.FB_PRIVATE_KEY
+} || 'service-account.json';
 
 /** ElasticSearch Settings
  *********************************************/
 
-if( process.env.BONSAI_URL ) {
-  processBonsaiUrl(exports, process.env.BONSAI_URL);
+if( process.env.ES_URL ) {
+  processBonsaiUrl(exports, process.env.ES_URL);
 }
 else {
   // ElasticSearch server's host URL
@@ -173,5 +177,5 @@ function processBonsaiUrl(exports, url) {
   exports.ES_PORT = 80;
   exports.ES_USER = matches[1];
   exports.ES_PASS = matches[2];
-  console.log('Configured using BONSAI_URL environment variable', url, exports);
+  console.log('Configured using ES_URL environment variable', url, exports);
 }
