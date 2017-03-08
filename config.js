@@ -47,6 +47,9 @@ else {
 
   // ElasticSearch password for http auth
   exports.ES_PASS  = process.env.ES_PASS || null;
+  
+  // ElasticSearch protocol
+  exports.ES_PROTOCOL = process.env.ES_PROTOCOL || 'http';
 }
 
 /** Paths to Monitor
@@ -159,8 +162,7 @@ exports.FL_SEARCH = !!process.env.FL_SEARCH;
 
 // Additional options for ElasticSearch client
 exports.ES_OPTS = {
-  requestTimeout: process.env.ES_TIMEOUT || 120000,
-  protocol: process.env.ES_PROTOCOL || 'http'
+  requestTimeout: process.env.ES_TIMEOUT || 120000
   //requestTimeout: 60000, maxSockets: 100, log: 'error'
 };
 
