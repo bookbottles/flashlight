@@ -14,6 +14,7 @@ var escOptions = {
   hosts: [{
     host: conf.ES_HOST,
     port: conf.ES_PORT,
+    protocol: conf.ES_PROTOCOL || 'http',
     auth: (conf.ES_USER && conf.ES_PASS) ? conf.ES_USER + ':' + conf.ES_PASS : null
   }]
 };
