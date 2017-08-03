@@ -47,7 +47,7 @@ else {
 
   // ElasticSearch password for http auth
   exports.ES_PASS  = process.env.ES_PASS || null;
-  
+
   // ElasticSearch protocol
   exports.ES_PROTOCOL = process.env.ES_PROTOCOL || 'http';
 }
@@ -71,6 +71,18 @@ else {
  ****************************************************/
 var duration = (process.env.FL_DAYS || 30) * 1000 * 60 * 60 * 24;
 var paths = [
+  {
+      name: "guest",
+      paths: ["guests", "guests^profiles", "guests^info"],
+      index: "firebase",
+      type: "guest",
+      parent_path: "venues",
+      parser: function(data, key, parentKey) {
+        return Object.assign({}, data, {
+          venue: parentKey
+        });
+      },
+  },
   {
     name  : "response",
     path  : "queue/responses",
