@@ -76,7 +76,7 @@ var paths = [
       paths: ["guests", "guests^profiles", "guests^info"],
       index: "firebase",
       type: "guest",
-      watch_path: "venues^names",
+      watch_path: "twilio/venues^accounts",
       parent_path: "venues",
       parser: function(data, key, parentKey) {
         return Object.assign({}, data, {
