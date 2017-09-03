@@ -9,8 +9,9 @@
 /** Firebase Settings
  ***************************************************/
 
-var _ = require('lodash')
-  , normalizers = require('./lib/normalizers');
+var _ = require('lodash'),
+  moment = require('moment'),
+  normalizers = require('./lib/normalizers');
 
 // Your Firebase instance where we will listen and write search results
 exports.FB_URL   = process.env.FB_URL || 'https://bb-app-sandbox.firebaseio.com/';
@@ -79,9 +80,17 @@ var paths = [
       watch_path: "twilio/venues^accounts",
       parent_path: "venues",
       parser: function(data, key, parentKey) {
+        var birthdayData = {};
+        if (data.birthday) {
+          var ytd = moment(data.birthday, 'x').set({ month: 0, date: 0, hour: 0, minute: 0, second: 0, millisecond: 0 });
+          birthdayData = {
+            birthdayYTD: moment(data.birthday, 'x').diff(ytd, 'day')
+          };
+        }
+
         return Object.assign({}, data, {
           venue: parentKey
-        });
+        }, birthdayData);
       },
   },
   {
