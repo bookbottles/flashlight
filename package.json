@@ -13,7 +13,8 @@
     "colors": "~0.6.2",
     "elasticsearch": "^11.0.1",
     "firebase-admin": "^4.0.4",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1"
   },
   "engines": {
     "node": "5.4.0",
