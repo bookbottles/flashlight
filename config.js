@@ -82,9 +82,9 @@ var paths = [
       parser: function(data, key, parentKey) {
         var birthdayData = {};
         if (data.birthday) {
-          var ytd = moment(data.birthday, 'x').set({ month: 0, date: 0, hour: 0, minute: 0, second: 0, millisecond: 0 });
+          var ytd = moment('2004-01-01'); // set any leap year
           birthdayData = {
-            birthdayYTD: moment(data.birthday, 'x').diff(ytd, 'day')
+            birthdayYTD: moment(data.birthday, 'x').set({ year: 2004 }).diff(ytd, 'day')
           };
         }
 
