@@ -2972,7 +2972,7 @@
                             }
                         }
                     },
-                    "location": {
+                    "pin": {
                         "type": "geo_point"
                     },
                     "reason": {
