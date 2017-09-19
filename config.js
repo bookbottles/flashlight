@@ -111,7 +111,7 @@ var paths = [
         }
         return Object.assign({}, data, {
             venue: parentKey
-        }, { location: location });
+        }, { pin: location });
       }
   },
   {
