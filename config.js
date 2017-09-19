@@ -11,6 +11,7 @@
 
 var _ = require('lodash'),
   moment = require('moment'),
+  zipcode = require('./zipcode'),
   normalizers = require('./lib/normalizers');
 
 // Your Firebase instance where we will listen and write search results
@@ -92,6 +93,26 @@ var paths = [
           venue: parentKey
         }, birthdayData);
       },
+  },
+  {
+      name: "ban",
+      paths: ["idscan/bans"],
+      index: "firebase",
+      type: "ban",
+      watch_path: "venues^names",
+      parent_path: "venues",
+      parser: function(data, key, parentKey) {
+        var location;
+        if (data.zip && zipcode[data.zip]) {
+          location = {
+            lat: zipcode[data.zip][0],
+            lon: zipcode[data.zip][1]
+          };
+        }
+        return Object.assign({}, data, {
+            venue: parentKey
+        }, { location: location });
+      }
   },
   {
     name  : "response",
