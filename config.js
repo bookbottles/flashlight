@@ -9,8 +9,10 @@
 /** Firebase Settings
  ***************************************************/
 
-var _ = require('lodash')
-  , normalizers = require('./lib/normalizers');
+var _ = require('lodash'),
+  moment = require('moment'),
+  zipcode = require('./zipcode'),
+  normalizers = require('./lib/normalizers');
 
 // Your Firebase instance where we will listen and write search results
 exports.FB_URL   = process.env.FB_URL || 'https://bb-app-sandbox.firebaseio.com/';
@@ -79,10 +81,38 @@ var paths = [
       watch_path: "twilio/venues^accounts",
       parent_path: "venues",
       parser: function(data, key, parentKey) {
+        var birthdayData = {};
+        if (data.birthday) {
+          var ytd = moment('2004-01-01'); // set any leap year
+          birthdayData = {
+            birthdayYTD: moment(data.birthday, 'x').set({ year: 2004 }).diff(ytd, 'day')
+          };
+        }
+
         return Object.assign({}, data, {
           venue: parentKey
-        });
+        }, birthdayData);
       },
+  },
+  {
+      name: "ban",
+      paths: ["idscan/bans"],
+      index: "firebase",
+      type: "ban",
+      watch_path: "venues^names",
+      parent_path: "venues",
+      parser: function(data, key, parentKey) {
+        var location;
+        if (data.zip && zipcode[data.zip]) {
+          location = {
+            lat: zipcode[data.zip][0],
+            lon: zipcode[data.zip][1]
+          };
+        }
+        return Object.assign({}, data, {
+            venue: parentKey
+        }, { pin: location });
+      }
   },
   {
     name  : "response",
