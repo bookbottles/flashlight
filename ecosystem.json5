@@ -2,8 +2,8 @@
   apps: [
     {
       name: 'flashlight',
-      script: 'node_modoules/.bin/nf',
-      args: 'start -j Procfile'
+      script: 'node_modules/.bin/nf',
+      args: 'start -j Procfile',
       env_production: {
         NODE_ENV: 'production'
       }
