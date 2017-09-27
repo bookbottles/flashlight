@@ -2,7 +2,8 @@
   apps: [
     {
       name: 'flashlight',
-      script: 'node_modoules/node-foreman/',
+      script: 'node_modoules/.bin/nf',
+      args: 'start -j Procfile'
       env_production: {
         NODE_ENV: 'production'
       }
