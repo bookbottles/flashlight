@@ -1,0 +1,11 @@
+{
+  apps: [
+    {
+      name: 'flashlight',
+      script: 'node_modoules/node-foreman/',
+      env_production: {
+        NODE_ENV: 'production'
+      }
+    }
+  ]
+}
