@@ -7,6 +7,14 @@
       env_production: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'flashlight-dev',
+      script: 'node_modules/.bin/nf',
+      args: 'start -j Procfile',
+      env_production: {
+        NODE_ENV: 'development'
+      }
     }
   ]
 }
