@@ -73,115 +73,115 @@ else {
  ****************************************************/
 var duration = (process.env.FL_DAYS || 30) * 1000 * 60 * 60 * 24;
 var paths = [
-  {
-      name: "guest",
-      paths: ["guests", "guests^profiles", "guests^info"],
-      index: "firebase",
-      type: "guest",
-      watch_path: "twilio/venues^accounts",
-      parent_path: "venues",
-      parser: function(data, key, parentKey) {
-        var birthdayData = {};
-        if (data.birthday) {
-          var ytd = moment('2004-01-01'); // set any leap year
-          birthdayData = {
-            birthdayYTD: moment(data.birthday, 'x').set({ year: 2004 }).diff(ytd, 'day')
-          };
-        }
+  // {
+  //     name: "guest",
+  //     paths: ["guests", "guests^profiles", "guests^info"],
+  //     index: "firebase",
+  //     type: "guest",
+  //     watch_path: "twilio/venues^accounts",
+  //     parent_path: "venues",
+  //     parser: function(data, key, parentKey) {
+  //       var birthdayData = {};
+  //       if (data.birthday) {
+  //         var ytd = moment('2004-01-01'); // set any leap year
+  //         birthdayData = {
+  //           birthdayYTD: moment(data.birthday, 'x').set({ year: 2004 }).diff(ytd, 'day')
+  //         };
+  //       }
 
-        return Object.assign({}, data, {
-          venue: parentKey
-        }, birthdayData);
-      },
-  },
-  {
-      name: "ban",
-      paths: ["idscan/bans"],
-      index: "firebase",
-      type: "ban",
-      watch_path: "venues^names",
-      parent_path: "venues",
-      parser: function(data, key, parentKey) {
-        var location;
-        if (data.zip && zipcode[data.venue_zip]) {
-          location = {
-            lat: zipcode[data.venue_zip][0],
-            lon: zipcode[data.venue_zip][1]
-          };
-        }
-        return Object.assign({}, data, {
-            venue: parentKey
-        }, { pin: location });
-      }
-  },
-  {
-    name  : "response",
-    path  : "queue/responses",
-    index : "firebase",
-    type  : "logs",
-    parser: function(data) {
-      return {
-        response: {
-          data: normalizers.responseData(data.data),
-          status: data.status,
-          time: data.time
-        }
-      };
-    },
-    refBuilder: function(ref) {
-      return ref.orderByChild('time').startAt(Date.now() - duration);
-    }
-  },
-  {
-    name  : "request",
-    path  : "logs/queue/requests",
-    index : "firebase",
-    type  : "logs",
-    resolver: function(data, key) {
-      return data.response;
-    },
-    parser: function(data, key) {
-      return {
-        request: {
-          _id: key,
-          action: data.action,
-          data: normalizers.requestData(data.data),
-          time: data.time
-        },
-        user: data.user,
-        venue: data.venue
-      };
-    },
-    refBuilder: function(ref) {
-      return ref.orderByChild('time').startAt(Date.now() - duration);
-    }
-  },
-  {
-    name  : "error",
-    path  : "logs/queue/errors",
-    index : "firebase",
-    type  : "logs",
-    filter: function(data) {
-      return !!data.task;
-    },
-    resolver: function(data, key) {
-      return data.task.response;
-    },
-    parser: function(data, key) {
-      return {
-        error: {
-          _id: key,
-          _log: data.task._log,
-          error: data.error,
-          state: data.state,
-          time: data.time
-        }
-      };
-    },
-    refBuilder: function(ref) {
-      return ref.orderByChild('time').startAt(Date.now() - duration);
-    }
-  }
+  //       return Object.assign({}, data, {
+  //         venue: parentKey
+  //       }, birthdayData);
+  //     },
+  // },
+  // {
+  //     name: "ban",
+  //     paths: ["idscan/bans"],
+  //     index: "firebase",
+  //     type: "ban",
+  //     watch_path: "venues^names",
+  //     parent_path: "venues",
+  //     parser: function(data, key, parentKey) {
+  //       var location;
+  //       if (data.zip && zipcode[data.venue_zip]) {
+  //         location = {
+  //           lat: zipcode[data.venue_zip][0],
+  //           lon: zipcode[data.venue_zip][1]
+  //         };
+  //       }
+  //       return Object.assign({}, data, {
+  //           venue: parentKey
+  //       }, { pin: location });
+  //     }
+  // },
+  // {
+  //   name  : "response",
+  //   path  : "queue/responses",
+  //   index : "firebase",
+  //   type  : "logs",
+  //   parser: function(data) {
+  //     return {
+  //       response: {
+  //         data: normalizers.responseData(data.data),
+  //         status: data.status,
+  //         time: data.time
+  //       }
+  //     };
+  //   },
+  //   refBuilder: function(ref) {
+  //     return ref.orderByChild('time').startAt(Date.now() - duration);
+  //   }
+  // },
+  // {
+  //   name  : "request",
+  //   path  : "logs/queue/requests",
+  //   index : "firebase",
+  //   type  : "logs",
+  //   resolver: function(data, key) {
+  //     return data.response;
+  //   },
+  //   parser: function(data, key) {
+  //     return {
+  //       request: {
+  //         _id: key,
+  //         action: data.action,
+  //         data: normalizers.requestData(data.data),
+  //         time: data.time
+  //       },
+  //       user: data.user,
+  //       venue: data.venue
+  //     };
+  //   },
+  //   refBuilder: function(ref) {
+  //     return ref.orderByChild('time').startAt(Date.now() - duration);
+  //   }
+  // },
+  // {
+  //   name  : "error",
+  //   path  : "logs/queue/errors",
+  //   index : "firebase",
+  //   type  : "logs",
+  //   filter: function(data) {
+  //     return !!data.task;
+  //   },
+  //   resolver: function(data, key) {
+  //     return data.task.response;
+  //   },
+  //   parser: function(data, key) {
+  //     return {
+  //       error: {
+  //         _id: key,
+  //         _log: data.task._log,
+  //         error: data.error,
+  //         state: data.state,
+  //         time: data.time
+  //       }
+  //     };
+  //   },
+  //   refBuilder: function(ref) {
+  //     return ref.orderByChild('time').startAt(Date.now() - duration);
+  //   }
+  // }
 ];
 
 var allPaths = _.map(paths, 'name')
