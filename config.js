@@ -103,10 +103,10 @@ var paths = [
       parent_path: "venues",
       parser: function(data, key, parentKey) {
         var location;
-        if (data.zip && zipcode[data.zip]) {
+        if (data.zip && zipcode[data.venue_zip]) {
           location = {
-            lat: zipcode[data.zip][0],
-            lon: zipcode[data.zip][1]
+            lat: zipcode[data.venue_zip][0],
+            lon: zipcode[data.venue_zip][1]
           };
         }
         return Object.assign({}, data, {
